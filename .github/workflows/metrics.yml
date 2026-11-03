@@ -1,0 +1,50 @@
+name: Commit metrics
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Full-year isometric commit calendar
+      - uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.isocalendar.svg
+          token: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
+          base: ""
+          config_timezone: America/Sao_Paulo
+          plugin_isocalendar: yes
+          plugin_isocalendar_duration: full-year
+
+      # Commits by day of week / hour + recent languages
+      - uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.habits.svg
+          token: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
+          base: ""
+          config_timezone: America/Sao_Paulo
+          plugin_habits: yes
+          plugin_habits_from: 200
+          plugin_habits_days: 30
+          plugin_habits_facts: no
+          plugin_habits_charts: yes
+
+      # Lines of code added / removed per week
+      - uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.lines.svg
+          token: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
+          base: ""
+          config_timezone: America/Sao_Paulo
+          plugin_lines: yes
+          plugin_lines_sections: base, history
+          plugin_lines_history_limit: 1
